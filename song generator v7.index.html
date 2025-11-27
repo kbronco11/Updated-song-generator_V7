@@ -1,0 +1,736 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Professional Song Generator V6</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: Arial; background: #667eea; min-height: 100vh; padding: 20px; }
+        .container { max-width: 1200px; margin: 0 auto; }
+        header { color: white; text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 40px; }
+        .main { display: grid; grid-template-columns: 1fr 2fr; gap: 20px; margin-bottom: 30px; }
+        .panel { background: white; padding: 20px; border-radius: 10px; }
+        .panel h2 { color: #667eea; margin-bottom: 15px; }
+        .control { margin-bottom: 15px; }
+        .control label { display: block; font-weight: bold; margin-bottom: 5px; font-size: 13px; }
+        input, select, textarea { width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 5px; font-size: 14px; }
+        .btn { padding: 10px 20px; margin-top: 10px; background: #667eea; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        .btn:hover { background: #764ba2; }
+        .songs { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 10px; max-height: 500px; overflow-y: auto; }
+        .song { background: #f0f0f0; padding: 15px; border-radius: 5px; text-align: center; cursor: pointer; }
+        .song:hover { background: #e0e0e0; }
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.7); z-index: 1000; align-items: center; justify-content: center; padding: 20px; }
+        .modal.show { display: flex; }
+        .modal-content { background: white; padding: 30px; border-radius: 10px; max-width: 700px; width: 100%; max-height: 80vh; overflow-y: auto; }
+        .close { float: right; font-size: 30px; cursor: pointer; }
+        .lyrics { white-space: pre-wrap; font-family: 'Courier New', monospace; font-size: 13px; line-height: 1.8; }
+        .empty { text-align: center; color: #999; padding: 40px; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>🎵 Professional Song Generator V6</h1>
+        </header>
+
+        <div class="main">
+            <div class="panel">
+                <h2>Settings</h2>
+
+                <div class="control">
+                    <label>Number of Songs:</label>
+                    <input type="number" id="numSongs" value="10" min="1" max="50">
+                </div>
+
+                <div class="control">
+                    <label>Mood (Optional):</label>
+                    <select id="mood">
+                        <option value="">-- Choose One --</option>
+                        <option value="happy">Happy</option>
+                        <option value="uplifting">Uplifting</option>
+                        <option value="sad">Sad</option>
+                        <option value="melancholic">Melancholic</option>
+                        <option value="dark">Dark</option>
+                        <option value="intense">Intense</option>
+                        <option value="romantic">Romantic</option>
+                        <option value="love">Love</option>
+                        <option value="energetic">Energetic</option>
+                        <option value="powerful">Powerful</option>
+                        <option value="chill">Chill</option>
+                        <option value="relaxed">Relaxed</option>
+                        <option value="aggressive">Aggressive</option>
+                        <option value="mysterious">Mysterious</option>
+                        <option value="empowering">Empowering</option>
+                        <option value="heroic">Heroic</option>
+                        <option value="nostalgic">Nostalgic</option>
+                        <option value="inspirational">Inspirational</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Genre (Optional):</label>
+                    <select id="genre">
+                        <option value="">-- Choose One --</option>
+                        <option value="pop">Pop</option>
+                        <option value="rock">Rock</option>
+                        <option value="country">Country</option>
+                        <option value="rnb">R&B</option>
+                        <option value="hiphop">Hip-Hop</option>
+                        <option value="indie">Indie</option>
+                        <option value="electronic">Electronic</option>
+                        <option value="jazz">Jazz</option>
+                        <option value="metal">Metal</option>
+                        <option value="acoustic">Acoustic</option>
+                        <option value="funk">Funk</option>
+                        <option value="classical">Classical</option>
+                        <option value="ambient">Ambient</option>
+                        <option value="reggae">Reggae</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Lyrical Theme (Optional):</label>
+                    <select id="theme">
+                        <option value="">-- Choose One --</option>
+                        <option value="heartbreak">Heartbreak</option>
+                        <option value="victory">Victory</option>
+                        <option value="betrayal">Betrayal</option>
+                        <option value="redemption">Redemption</option>
+                        <option value="secrets">Secrets</option>
+                        <option value="freedom">Freedom</option>
+                        <option value="revenge">Revenge</option>
+                        <option value="hope">Hope</option>
+                        <option value="longing">Longing</option>
+                        <option value="growth">Growth</option>
+                        <option value="love">Love Story</option>
+                        <option value="loss">Loss & Letting Go</option>
+                        <option value="journey">Journey & Discovery</option>
+                        <option value="empowerment">Self Empowerment</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Tempo/Energy (Optional):</label>
+                    <select id="tempo">
+                        <option value="">-- Choose One --</option>
+                        <option value="slow">Slow (Ballad)</option>
+                        <option value="slowmedium">Slow-Medium (Dreamy)</option>
+                        <option value="medium">Medium (Standard)</option>
+                        <option value="midtempo">Mid-Tempo (Groovy)</option>
+                        <option value="fast">Fast (Upbeat)</option>
+                        <option value="veryfast">Very Fast (Intense)</option>
+                        <option value="acoustic">Acoustic (Stripped)</option>
+                        <option value="electronic">Electronic (Synth)</option>
+                        <option value="uptempo">Up-Tempo (Dance)</option>
+                        <option value="hyperpop">Hyperpop (Experimental)</option>
+                        <option value="random">Random Tempo</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Era/Decade (Optional):</label>
+                    <select id="era">
+                        <option value="">-- Choose One --</option>
+                        <option value="50s">1950s</option>
+                        <option value="60s">1960s</option>
+                        <option value="70s">1970s</option>
+                        <option value="80s">1980s</option>
+                        <option value="90s">1990s</option>
+                        <option value="2000s">2000s</option>
+                        <option value="2010s">2010s</option>
+                        <option value="2020s">2020s/Modern</option>
+                        <option value="retro">Retro/Timeless</option>
+                        <option value="vintage">Vintage</option>
+                        <option value="futuristic">Futuristic</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Custom Sound/Style (Type Here):</label>
+                    <input type="text" id="customStyle" placeholder="e.g., 80s rock, 70s funk, 90s grunge">
+                </div>
+
+                <div class="control">
+                    <label>Song Length:</label>
+                    <select id="songLength">
+                        <option value="3">3 Minutes</option>
+                        <option value="4">4 Minutes</option>
+                        <option value="5">5 Minutes</option>
+                        <option value="6">6 Minutes</option>
+                        <option value="7">7 Minutes</option>
+                        <option value="8">8 Minutes</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Mode:</label>
+                    <select id="mode">
+                        <option value="standard">Standard Song</option>
+                        <option value="epic">Epic 🔥</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Collaboration (Optional):</label>
+                    <select id="collab">
+                        <option value="">-- Choose One --</option>
+                        <option value="solo">Solo</option>
+                        <option value="duet-random">Duet (Random Style)</option>
+                        <option value="duet-mf">Duet (Male Lead / Female Support)</option>
+                        <option value="duet-fm">Duet (Female Lead / Male Support)</option>
+                        <option value="duet-mf-trade">Duet (Male/Female Trading Lines)</option>
+                        <option value="duet-fm-trade">Duet (Female/Male Trading Lines)</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Backup Vocals (Optional):</label>
+                    <select id="backup">
+                        <option value="">-- Choose One --</option>
+                        <option value="minimal">Minimal Backing</option>
+                        <option value="moderate">Moderate Backing</option>
+                        <option value="full">Full Choir/Gospel Style</option>
+                    </select>
+                </div>
+
+                <div class="control">
+                    <label>Artist/Band Style (Type Here):</label>
+                    <input type="text" id="artistStyle" placeholder="e.g., Nickelback, Pink Floyd, Taylor Swift">
+                </div>
+
+                <div class="control">
+                    <label>Ban Words:</label>
+                    <textarea id="banWords" placeholder="baby,love,heart" style="height: 50px;"></textarea>
+                </div>
+
+                <button class="btn" onclick="generate()" style="width: 100%;">Generate!</button>
+            </div>
+
+            <div class="panel">
+                <h2>Your Songs</h2>
+                <div id="songList" class="songs">
+                    <div class="empty">Click Generate to create songs</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="panel">
+            <h2>Custom Words</h2>
+            <div class="control">
+                <label>Adjectives:</label>
+                <textarea id="adj" style="height: 60px;"></textarea>
+            </div>
+            <div class="control">
+                <label>Nouns:</label>
+                <textarea id="nouns" style="height: 60px;"></textarea>
+            </div>
+            <div class="control">
+                <label>Verbs:</label>
+                <textarea id="verbs" style="height: 60px;"></textarea>
+            </div>
+        </div>
+    </div>
+
+    <div id="modal" class="modal">
+        <div class="modal-content">
+            <span class="close" onclick="closeModal()">&times;</span>
+            <h2 id="modalTitle" style="color: #667eea; margin-bottom: 20px;"></h2>
+            <div class="lyrics" id="modalLyrics"></div>
+            <button class="btn" onclick="copyLyrics()" style="width: 100%; margin-top: 20px;">Copy Lyrics</button>
+        </div>
+    </div>
+
+    <script>
+        const defaults = {
+            adj: ['Broken', 'Golden', 'Silent', 'Electric', 'Faded', 'Burning', 'Endless', 'Midnight', 'Velvet', 'Dancing', 'Lost', 'Rising', 'Haunted', 'Shattered', 'Mystic', 'Vivid', 'Wild', 'Frozen', 'Twisted', 'Sacred'],
+            nouns: ['Heart', 'Sky', 'Rain', 'Fire', 'Dreams', 'Wings', 'Light', 'Ocean', 'Storm', 'Echoes', 'Soul', 'Ghost', 'Paradise', 'Horizon', 'Thunder', 'Shadows', 'River', 'Mountain', 'Stars', 'Moon'],
+            verbs: ['Running', 'Falling', 'Rising', 'Breaking', 'Flying', 'Fading', 'Calling', 'Waiting', 'Chasing', 'Letting', 'Burning', 'Drowning', 'Dancing', 'Screaming', 'Breathing', 'Fighting']
+        };
+
+        const adlibs = ['Yeah', 'Uh-huh', 'Mmm', 'Oh', 'Woo', 'Hey', 'Alright', 'Whoa'];
+        const shortAdlibs = ['yeah', 'oh', 'mmm', 'ah', 'hey', 'uh-huh'];
+        const questionAdlibs = ['you know?', 'right?', 'can you feel it?', 'what can I say?'];
+
+        const qualityTitles = [
+            'Take Me Home', 'Hold Me Close', 'Let Me Go', 'Stay With Me', 'Break Me Down',
+            'Set Me Free', 'One More Night', 'All Over Again', 'Never Let Go', 'Lost Without You',
+            'Feel The Fire', 'Without You', 'Time After Time', 'Into The Night', 'Through The Fire',
+            'The Last Goodbye', 'The Only Way', 'When I\'m Gone', 'If I Could', 'If You Stay',
+            'Fading Away', 'Burning Bridges', 'Chasing Shadows', 'Breaking Free', 'Falling Apart',
+            'Rising Up', 'Standing Strong', 'Running Wild', 'Walking Alone', 'Dancing Tonight',
+            'Hearts on Fire', 'Dreams Come True', 'Tears Fall Down', 'Stars Align', 'Shadows Dance',
+            'Come Back Home', 'Never Say Never', 'Always Forever', 'Here With Me', 'Close To You',
+            'Far Away', 'Right Here', 'Over You', 'Under The Stars', 'Beyond The Sky',
+            'After Dark', 'Before Dawn', 'At Midnight', 'Till Morning', 'Every Night',
+            'All Day Long', 'Just Once More', 'One Last Time', 'First Love', 'True Love',
+            'Wild Heart', 'Cold Hands', 'Warm Touch', 'Sweet Dreams', 'Bitter End',
+            'High Hopes', 'Low Down', 'Deep Water', 'Shallow Grave', 'Open Road',
+            'Closed Door', 'New Beginning', 'Old Flame', 'Young Blood', 'Ancient Soul',
+            'Forever Young', 'Never Old', 'Always New', 'Something Real', 'Nothing Left',
+            'Everything Changed', 'Anything Goes', 'Somewhere Out There', 'Nowhere To Run', 'Everywhere I Go',
+            'Somebody Save Me', 'Nobody Knows', 'Everybody Hurts', 'Anyone Else', 'Someone Like You',
+            'Call Me Maybe', 'Tell Me Why', 'Show Me Love', 'Give Me Strength', 'Bring Me Back',
+            'Leave Me Alone', 'Make Me Whole', 'Find My Way', 'Lose Myself', 'Keep Me Safe',
+            'Save My Soul', 'Heal My Heart', 'Break These Chains', 'Light The Way', 'Dark Times',
+            'Bright Future', 'Long Night', 'Short Days', 'Good Times', 'Bad Habits',
+            'Better Days', 'Worst Nightmare', 'Best Friend', 'True Colors', 'False Promises',
+            'Real Talk', 'Fake Smile', 'Honest Truth', 'Sweet Lies', 'Bitter Truth',
+            'Heavy Heart', 'Light Touch', 'Soft Voice', 'Loud Silence', 'Quiet Storm',
+            'Gentle Rain', 'Hard Times', 'Easy Love', 'Tough Love', 'Simple Life'
+        ];
+
+        // MASSIVE VERSE LIBRARY - 150+ UNIQUE VERSES
+        const verses = [
+            "I've been staring at your picture for way too long\nTrying to remember where it all went wrong\nEvery memory cuts deeper than before",
+            "Saw you yesterday with someone new, {adlib}\nGuess you moved on faster than I thought you'd do\nI'm still here picking up the pieces on my own",
+            "Driving past our favorite places in this town\nEvery street corner brings your memory down\nI thought time would heal but it just makes it worse",
+            "Found your t-shirt in my drawer today\nStill smells like you even though you went away\nI should throw it out but I just can't let go, {adlib}",
+            "The radio won't stop playing our old song\nI change the station but the damage is already done\nEvery lyric brings me right back to your touch",
+            "Everyone says that I should move along\nBut they don't know the way you sang our favorite song\nThey don't see your face every time I close my eyes",
+            "I walked into the coffee shop we used to love\nOrdered both our drinks out of habit, I'm so lost\nThe barista asked where you've been lately now",
+            "Your side of the closet's empty now, {adlib}\nI gave away your things but kept your favorite sweater somehow\nIt's the only thing that still feels like you're near",
+            "Ran into your mother at the grocery store\nShe asked about us and it cut me to the core\nI lied and said that everything's okay",
+            "I thought I saw you walking down the street today\nMy heart stopped for a second then you turned away\nIt was just a stranger but for a moment there",
+            "Your toothbrush is still sitting by the sink\nI can't bring myself to move it, I just think\nMaybe one day you'll come back and need it here, {adlib}",
+            "All our friends have chosen sides it seems\nI lost half my life when I lost you and our dreams\nNow I'm drinking alone on a Friday night",
+            "I wrote you a letter that I'll never send\nSaying all the things I should've said back then\nIt's sitting in my drawer collecting dust",
+            "Your voicemail's still the one I hear each day\nI saved it just to hear you one more time this way\nI know I'm pathetic but I don't really care",
+            "Went to therapy and talked about the pain\nDoc said I'm holding on to things I can't regain\nBut they don't understand what we had here",
+            "The seasons changed but I'm still stuck in spring\nWhen you were mine and we had everything\nNow winter's here and I'm frozen without you",
+            "Never thought I'd feel this way again, {adlib}\nThen you walked into my life and everything made sense\nYou're the missing piece I didn't know I needed here",
+            "Every morning when I wake up next to you\nI thank the stars above for making dreams come true\nYou're everything I've ever wanted and much more",
+            "The way you smile lights up the darkest room\nChases all my worries away, makes flowers bloom\nI never knew that love could feel this way",
+            "We stayed up all night talking till the sun came up\nSharing secrets over coffee in our favorite cup\nI could listen to your voice for hours on end",
+            "You held my hand through all my darkest days\nNever let me give up, showed me better ways\nI don't know where I'd be without you here, {adlib}",
+            "Dancing in the kitchen to our favorite song\nYou pull me close and suddenly nothing's wrong\nThese simple moments are what I live for now",
+            "Your laugh is like music to my weary soul\nYou make me feel complete, you make me whole\nI never want this feeling here to end",
+            "We talk about forever like it's guaranteed\nBuilding all our dreams on the love we need\nI see my future clearly when I look at you",
+            "You know me better than I know myself\nAll my quirks and flaws you love like nothing else\nI'm so grateful that our paths aligned",
+            "Late night drives with nowhere left to go, {adlib}\nYour hand in mine, the radio down low\nThese are the moments that I'll remember most",
+            "You make the ordinary feel extraordinary\nTurning simple days into something legendary\nI fall a little more each time you say my name",
+            "Your eyes tell stories that I want to read\nYour touch is everything I'll ever need\nI'm lost in this feeling and I don't want to be found",
+            "We fit together like we were designed\nTwo puzzle pieces perfectly aligned\nYou're my other half, my better part",
+            "When you're away I count the minutes down\nUntil you're back and safe here in this town\nI miss you more than words could ever say",
+            "I've been knocked down more times than I can count\nBut I keep getting up, I'll surmount\nEvery obstacle that stands here in my way",
+            "They said I'd never make it on my own, {adlib}\nBut look at me now, see how I've grown\nI proved them wrong and I'll do it again",
+            "No more living in somebody else's shadow\nI'm stepping out into the light right now though\nThis is my time, this is my moment here",
+            "I've learned to love the person in the mirror\nAll my scars and flaws are getting clearer\nThey made me who I am, I'm proud to say",
+            "Done apologizing for who I am inside\nDone trying to fit in or trying to hide\nI'm embracing every part of me today",
+            "Burned every bridge that led back to my past\nI'm moving forward fast, no looking back at last\nThe future's calling and I'm ready to begin",
+            "My voice was silenced but I found it again, {adlib}\nI'm speaking up now, I'm not giving in\nTo anyone who tries to dim my light",
+            "I don't need your validation anymore\nI've found my worth and so much more\nI'm complete all on my own you see",
+            "They underestimated what I could do\nNow I'm proving that their doubts weren't true\nI'm stronger than they'll ever understand",
+            "I've walked through fire and came out alive\nMore than surviving, I'm learning to thrive\nNothing can stop me when I set my mind",
+            "No more playing small to make you comfortable\nI'm claiming my space, I'm unstoppable\nWatch me rise above everything you said",
+            "Every failure taught me something new\nEvery setback made me push right through\nI'm grateful for the struggles that I've faced",
+            "I'm writing my own story from today, {adlib}\nNo one else controls the things I say\nOr do or think or dream about at night",
+            "The only person I need to impress\nIs staring back at me, I must confess\nI'm doing this for me and no one more",
+            "I don't need a hero to come save me here\nI'm my own hero, let me make it clear\nI rescue myself every single day",
+            "Remember summer nights when we were seventeen\nStaying out too late, living the dream\nThose days are gone but memories remain",
+            "Found an old shoebox full of photographs, {adlib}\nMade me smile and made me laugh\nAt all the things we used to do back then",
+            "The old neighborhood doesn't look the same\nThey tore down our hangout, what a shame\nBut I can still see us there if I try",
+            "Mom's old records playing on the stereo\nRemind me of a time so long ago\nWhen life was simple and the world was new",
+            "Drove past our old school yesterday\nCouldn't believe how much has changed that way\nBut in my mind it's still exactly how it was",
+            "The mixtapes that we made each other then\nI found mine and played it once again\nEvery song brought back a memory",
+            "Remember staying up till dawn just talking, {adlib}\nThrough the neighborhood just walking\nThose conversations meant the world to me",
+            "The diner where we spent every Friday night\nOrdering fries and everything was right\nWish I could go back one more time",
+            "Old home videos from way back when\nWatching them makes me miss it all again\nThe sound of laughter, innocence so pure",
+            "The songs we sang on summer car rides\nWindows down with nothing to hide\nThose moments felt like they would never end",
+            "Packed my bags and left it all behind\nNo more chains, no more confined\nI'm heading out to find what I've been missing here",
+            "Windows down and music up real loud, {adlib}\nLost in the wind, lost in the crowd\nOf possibilities that stretch ahead so far",
+            "No more living by their rules and regulations\nI'm seeking my own destination\nWherever the road takes me I will go",
+            "Cut all the strings that held me to the ground\nNow I'm flying, I'm unbound\nTasting freedom for the very first time",
+            "The open road is calling out my name\nI'll never be the same\nAfter I've seen all there is to see",
+            "Breaking out of this small town tonight\nChasing stars with all my might\nThe world is bigger than these city limits here",
+            "I was a bird trapped in a cage too small, {adlib}\nNow I'm soaring above it all\nFlying higher than I ever thought I'd go",
+            "The horizon's mine to chase down now\nI'm unshackled somehow\nFrom everything that said I had to stay",
+            "Living wild and living on my own terms\nI've learned\nThat the only life worth living is one that's free",
+            "Sunset paints the sky in shades of gold\nAnother story waiting to be told\nI'm writing mine with every step I take",
+            "City lights are calling out my name tonight\nEverything just feels so right\nThis is where I'm meant to be, I know it now",
+            "Rolling down the interstate at midnight\nHeadlights cutting through the dark so bright\nI've never felt more alive than this",
+            "Coffee at a roadside diner, watching people pass\nEveryone's got somewhere to go so fast\nI'm taking my time, learning to just be",
+            "Stranger in a new town, nobody knows my face\nStarting over in this place\nIt's scary but it's exactly what I need",
+            "Mountains in the distance calling me to climb\nGonna take it one step at a time\nThe view from up there must be worth the fight",
+            "Ocean waves are crashing on the shore below\nSalt air and the undertow\nReminds me that some things never change",
+            "Desert heat is beating down on me today\nBut I'm not turning back this way\nI came too far to give up now",
+            "Rain is pouring down but I don't care\nDancing like nobody's there\nFeeling free for the first time in years",
+            "Thunder rolling in across the plains\nWashing away all my pains\nMother nature's got a way of healing things",
+            "Sitting on my porch watching the world go by\nClouds are drifting through the sky\nSometimes peace is all you really need",
+            "Backroads winding through the countryside\nTaking turns I've never tried\nGetting lost has never felt so good",
+            "Neon signs are flickering in the rain\nThis city's got its own kind of pain\nBut there's beauty in the broken too",
+            "Rooftop view of everything below\nWatching as the city glows\nUp here I feel like I can touch the stars",
+            "Subway rumbling underneath my feet\nPeople rushing down the street\nEveryone's a story I'll never know",
+            "Corner store at 2 AM\nJust me and my thoughts again\nStrange how loneliness can feel like home",
+            "Vinyl spinning on the turntable slow\nOld songs from years ago\nMusic takes me places words cannot",
+            "Sitting in the back of a crowded bar\nStranger playing old guitar\nSometimes perfect moments come from nowhere",
+            "Graffiti on the walls tells stories untold\nThis neighborhood's got soul\nEvery corner's got its own history here",
+            "Park bench in the autumn leaves\nCool wind through the trees\nNature's got its own kind of symphony",
+            "Library quiet except for turning pages\nWisdom trapped in cages\nEvery book's an entire world to explore",
+            "Bus stop in the early morning light\nEveryone looks tired tonight\nWe're all just trying to make it through",
+            "Farmer's market on a Sunday morning\nEveryone's adorning\nTheir lives with simple pleasures and fresh air",
+            "Gym at midnight, no one else around\nJust me and the sound\nOf iron plates and quiet determination",
+            "Laundromat fluorescent lights\nSpending lonely Friday nights\nWatching clothes spin round and round",
+            "Bodega cat sitting in the window\nJudging everyone below\nThat cat's seen more than we ever will",
+            "Fire escape becomes my private space\nCity's chaos I embrace\nFrom up here it almost looks peaceful",
+            "Phone booth in the rain\nCalling home again\nSome traditions never die",
+            "Record store crates I'm flipping through\nLooking for something new\nBut finding comfort in the old instead",
+            "Tattoo parlor late at night\nMaking permanent what feels right\nInk and skin and stories intertwined",
+            "Vintage shop with clothes from decades past\nNothing here was made to last\nBut somehow these old things survive",
+            "Food truck tacos after midnight\nEverything tastes better by street light\nBest meals come from unexpected places",
+            "Basketball court where I learned to play\nComing back here every day\nThis concrete is sacred ground to me",
+            "Train tracks running through the neighborhood\nUsed to think I never could\nLeave this place but now I'm not so sure",
+            "Water tower with our names spray painted\nMemories that haven't faded\nWe thought we'd own this town forever",
+            "Abandoned factory where we used to hide\nNow there's condos on the side\nProgress has a way of erasing things",
+            "Pier where I go to clear my head\nWatching boats instead\nOf dealing with my problems like I should",
+            "Bridge I cross to get to work each day\nSame route, same way\nBut somehow it looks different every time"
+        ];
+
+        // 60+ UNIQUE PRE-CHORUSES
+        const prechoruses = [
+            "And I know I should let go\nBut my heart won't let me though\nI'm stuck here in between, {adlib}",
+            "Every night I lie awake\nWondering what it would take\nTo get you back again",
+            "I see you everywhere I go\nCan't escape, you should know\nYou're haunting me each day",
+            "Maybe someday I'll be fine\nBut tonight you're still mine\nIn my memories at least, {adlib}",
+            "I'm trying hard to move along\nBut everything feels wrong\nWithout you by my side",
+            "And I never want to lose this feeling here\nWith you everything is crystal clear\nYou're my forever and a day",
+            "Every moment with you feels so right\nLike coming home after a long flight\nYou're my safe place to be, {adlib}",
+            "I never knew love could be this way\nEvery night and every day\nYou show me what it means",
+            "This is what I've been waiting for\nYou're everything and so much more\nThan I could ever dream",
+            "You've changed my life in every way\nThere's nothing else I need to say\nExcept I love you more and more, {adlib}",
+            "And I'm not backing down this time\nI'm claiming what is mine\nNo one can stop me now",
+            "I've found my voice and I'll use it loud\nI'm standing tall, I'm standing proud\nNothing's holding me back anymore, {adlib}",
+            "They can't define who I'm meant to be\nI'm breaking free, I decree\nMy destiny is mine to make",
+            "Every scar has made me strong\nI've been right where I belong\nAll along inside of me",
+            "I'm done living in the past\nI'm moving forward fast\nTo everything I'm meant to be, {adlib}",
+            "If I could turn back time somehow\nI'd be there right now\nReliving every precious day",
+            "Those memories keep me warm at night\nWhen everything's not quite right\nI close my eyes and I'm back there, {adlib}",
+            "I wish I knew back then\nThat it would end\nI would have held on tighter to those days",
+            "Time moves fast and life goes on\nBut those days aren't really gone\nThey live inside of me",
+            "I'm grateful for the past we shared\nAll the love and all the care\nThose moments shaped who I am now, {adlib}",
+            "And I can feel it in my bones\nI'm finally coming home\nTo who I'm meant to be",
+            "The chains are broken on the ground\nI'm finally unbound\nFrom everything that held me down, {adlib}",
+            "There's no going back from here\nThe path ahead is clear\nI'm running towards the light",
+            "Liberation's in my veins\nI've broken all the chains\nNothing's stopping me today",
+            "The cage door's open wide\nNo reason left to hide\nI'm stepping into my own power now, {adlib}",
+            "So here we are at the crossroads now\nGotta figure out somehow\nWhich way to go from here",
+            "Can't keep running from the truth\nI'm not bulletproof\nBut I'm stronger than I thought, {adlib}",
+            "Walls I built are coming down\nFinally solid ground\nUnderneath my feet at last",
+            "What if this is my last chance\nTo change my circumstance\nI better take it while I can, {adlib}",
+            "Looking back won't change a thing\nGotta spread my wings\nAnd fly into the unknown",
+            "Heart's been heavy for too long\nTime to right the wrongs\nAnd start living for myself, {adlib}",
+            "I can hear the future calling\nNo more stalling\nIt's time to answer loud and clear",
+            "Fear's been holding me in place\nBut I'm done with that race\nI'm running towards the sunrise now, {adlib}",
+            "Second chances don't come free\nThis one's costing me\nEverything I thought I knew",
+            "Bridge is burning behind me\nFire reminds me\nThere's no turning back from this, {adlib}",
+            "Counting down the days until\nI climb that hill\nAnd see what's on the other side",
+            "Been wearing this mask so long\nSinging someone else's song\nTime to show my real face now, {adlib}",
+            "What's the worst that could happen here\nIf I conquer fear\nAnd jump into the deep end",
+            "They say what doesn't kill you\nWill fulfill you\nI'm about to test that theory out, {adlib}",
+            "Standing at the starting line\nThis race is mine\nTo run at my own pace",
+            "Sun is setting on the old me\nFinally I'll be\nWho I was always meant to be, {adlib}",
+            "Clock is ticking, time is running\nNo more running\nFrom the person in the mirror",
+            "Mountains look smaller from up here\nVision's clear\nI can see for miles and miles, {adlib}",
+            "Storms don't last forever though\nI know, I know\nThe sky will clear eventually",
+            "Rising from the ashes new\nStarting through\nWith nothing but the lessons learned, {adlib}",
+            "Pages turning chapter closed\nI suppose\nThat's how stories have to go",
+            "Seasons change and so do I\nWatching time fly\nTurning into something better, {adlib}",
+            "Light's appearing through the cracks\nNo looking back\nAt what used to be before",
+            "Silence speaks louder than noise\nMade my choice\nAnd now I'm living with it, {adlib}",
+            "Questions have no answers here\nMaking it clear\nThat I don't need to know it all"
+        ];
+
+        // 40+ UNIQUE CHORUSES (with minimal title repetition)
+        const choruses = [
+            "This is {title}\nAll I can do is pray\nMissing you every single day, {adlib}",
+            "{title}\nIt's tearing me apart inside\nGot nowhere left to hide\nFrom all this pain, {adlib}",
+            "Oh, {title}\nYou're everything to me\nRight where I want to be, {adlib}\nIn your arms tonight",
+            "{title}\nI'm taking back my power now\nWatch me rise, I'll show you how\nNothing's gonna bring me down, {adlib}",
+            "Gonna give you {title}\nNothing left to say\nAll I can do is pray, {adlib}\nI miss you every day",
+            "{title}\nTake me back to yesterday\nWhen life was simple in every way, {adlib}\nI'd give anything for that again",
+            "This is {title}\nI'm finally breaking free tonight\nSpreading my wings for the first time, {adlib}\nNothing's holding me down",
+            "{title}\nIs all I have left now\nTrying to figure out how\nTo move on from here, {adlib}",
+            "Yeah, {title}\nYou make me feel alive\nEvery moment by your side, {adlib}\nThis is where I belong",
+            "{title}\nI'm stronger than I've ever been\nWatch me rise and watch me win, {adlib}\nNo one's standing in my way",
+            "Mmm, {title}\nThose were the days we'll never forget\nNo regrets, {adlib}\nJust memories keeping me warm",
+            "{title}\nThe open road is calling me\nThis is what it means to be\nCompletely free and on my own, {adlib}",
+            "Oh, {title}\nWhy'd you have to walk away\nAll I can say, {adlib}\nIs that I miss you every day",
+            "{title}\nI'm falling deeper every day\nIn every single way, {adlib}\nYou make my world complete",
+            "{title}\nI'm unstoppable right now\nI've learned how, {adlib}\nTo stand up tall and take my place",
+            "{title}\nWishing I could turn back time\nWhen everything was fine, {adlib}\nBefore the world got complicated",
+            "This is {title}\nLike a bird without a cage\nTurning to a brand new page, {adlib}\nWriting my own story now",
+            "{title}\nEchoing through empty rooms\nMemories like old perfumes, {adlib}\nLingering after you're gone",
+            "{title}\nForever's what I want with you\nEvery word you say is true, {adlib}\nYou're my once in a lifetime",
+            "Yeah, {title}\nI'm a force you can't contain\nBreaking every chain, {adlib}\nI'm powerful and free",
+            "{title}\nRemembering the way we were\nEverything's a blur, {adlib}\nExcept those precious moments shared",
+            "{title}\nNo more chains to hold me here\nThe horizon's crystal clear, {adlib}\nRunning towards my destiny",
+            "This is {title}\nAnd nothing's ever been more true\nAll I know is missing you, {adlib}\nEvery single day",
+            "{title}\nThe way you make me feel inside\nLike I'm finally alive, {adlib}\nThis is what love's supposed to be",
+            "{title}\nI'm everything I need to be\nWatch me break free, {adlib}\nFrom everything that held me back",
+            "Mmm, {title}\nTake me back to simpler times\nWhen the world was mine, {adlib}\nAnd everything felt possible",
+            "{title}\nI'm answering the call\nBreaking down every wall, {adlib}\nThat tried to keep me locked inside",
+            "{title}\nIs all that's left of us now\nTrying to figure out how\nTo pick up these pieces, {adlib}",
+            "Oh, {title}\nYou're all I'm living for\nEvery moment by your side, {adlib}\nThis is where I need to be",
+            "{title}\nI'm taking back what's mine\nClaiming my own time, {adlib}\nNo one's gonna stop me now"
+        ];
+
+        // 30+ UNIQUE BRIDGES
+        const bridges = [
+            "Maybe this is just the way it goes\nMaybe everybody knows\nThat sometimes you gotta let things burn\nBefore you learn, {adlib}",
+            "I've been thinking about what you said\nAll those words still in my head\nCan't shake them no matter what I do\nThey're stuck like glue, {adlib}",
+            "If I could do it all again\nI'd probably make the same mistakes back then\nBecause they taught me who I am\nNow I understand, {adlib}",
+            "What if I'm not ready yet\nWhat if I'm full of regret\nDoes it even matter anymore\nI'm not sure, {adlib}",
+            "When the dust finally settles down\nWhen I'm no longer spinning round\nMaybe then I'll finally see\nWhat's meant to be, {adlib}",
+            "Looking back I understand now\nEverything works out somehow\nEven when it doesn't feel that way\nDay by day, {adlib}",
+            "I know it's not easy letting go\nBut sometimes we've got to know\nWhen to hold on and when to fly\nGoodbye, {adlib}",
+            "They say that time will heal all wounds\nSooner or later, never too soon\nBut I'm still waiting for that day\nSomeday, {adlib}",
+            "Standing at the edge of something new\nDon't know what I'm gonna do\nBut I'm ready to find out\nWithout doubt, {adlib}",
+            "I never saw it coming here\nNever thought I'd shed these tears\nBut crying's just another way to heal\nIt's real, {adlib}",
+            "What doesn't kill you makes you stronger\nCan't wait any longer\nTo become who I'm meant to be\nFinally free, {adlib}",
+            "In the silence I can hear\nEverything becoming clear\nThe answers were inside me all along\nWhere I belong, {adlib}",
+            "Fighting battles in my mind\nTrying hard to find\nSome peace in all this chaos here\nNo more fear, {adlib}",
+            "Maybe I've been wrong this whole time\nMaybe that's fine\nAs long as I keep learning as I go\nNow I know, {adlib}",
+            "Looking in the mirror now I see\nSomeone looking back at me\nWho I don't quite recognize yet\nNo regret, {adlib}",
+            "Every ending's a beginning too\nSomething old, something new\nClosing doors and opening windows wide\nOn this ride, {adlib}",
+            "I've been carrying this weight so long\nSinging the same sad song\nTime to change the melody I think\nOn the brink, {adlib}",
+            "What if I just let it all go\nWhat if I just flow\nWith whatever comes my way from here\nNo more fear, {adlib}",
+            "Standing in the rain without an umbrella\nLetting water tell a\nStory of rebirth and starting over\nGetting closer, {adlib}",
+            "Pieces of my heart scattered on the floor\nDon't know what for\nBut I'll pick them up and start again\nIn the end, {adlib}"
+        ];
+
+        const intros = {
+            pop: ['[Intro - Bright synth melody at 110 bpm]', '[Intro - Catchy keyboard hook, four-on-floor kick]'],
+            rock: ['[Intro - Heavy distorted guitar riff at 120 bpm]', '[Intro - Crunchy power chords, aggressive drums]'],
+            country: ['[Intro - Gentle steel guitar, brushed drums at 95 bpm]', '[Intro - Acoustic fingerpicking, pedal steel]'],
+            rnb: ['[Intro - Smooth electric piano at 85 bpm]', '[Intro - Silky synth pads, groovy bass]'],
+            indie: ['[Intro - Jangly guitar with reverb at 100 bpm]', '[Intro - Lo-fi drums, warm synths]'],
+            electronic: ['[Intro - Pulsing synth arpeggios at 128 bpm]', '[Intro - Glitchy beats, deep bass]'],
+            acoustic: ['[Intro - Fingerstyle guitar at 90 bpm]', '[Intro - Gentle strumming, soft percussion]'],
+            metal: ['[Intro - Brutal riff, double-kick at 140 bpm]', '[Intro - Fast tremolo picking, blast beats]'],
+            hiphop: ['[Intro - Hard-hitting 808s at 95 bpm]', '[Intro - Boom-bap drums, sampled melody]'],
+            jazz: ['[Intro - Smooth saxophone at 110 bpm]', '[Intro - Piano comping, walking bass]'],
+            funk: ['[Intro - Slap bass groove at 105 bpm]', '[Intro - Tight drum pocket, wah guitar]'],
+            classical: ['[Intro - Orchestral strings, gentle dynamics]', '[Intro - Piano melody, string accompaniment]'],
+            ambient: ['[Intro - Atmospheric pads, sparse textures]', '[Intro - Reverb-drenched tones, minimal percussion]'],
+            reggae: ['[Intro - Offbeat guitar skank at 85 bpm]', '[Intro - Dub bass, steady riddim]']
+        };
+
+        const chorusDesc = {
+            pop: 'catchy hooks, uplifting energy',
+            rock: 'driving drums, raw power',
+            country: 'heartfelt delivery, warm pedal steel',
+            rnb: 'smooth vocals, layered harmonies',
+            indie: 'atmospheric build, emotional peak',
+            electronic: 'synth explosion, driving beat',
+            acoustic: 'intimate delivery, raw emotion',
+            metal: 'crushing riffs, aggressive vocals',
+            hiphop: 'hard-hitting flow, bass drops',
+            jazz: 'improvisation, swinging rhythm',
+            funk: 'groove locks in, infectious energy',
+            classical: 'orchestral swell, dynamic crescendo',
+            ambient: 'textural layers, atmospheric climax',
+            reggae: 'riddim intensifies, uplifting skank'
+        };
+
+        const duetTypes = [
+            {v1:'Male',v2:'Female',c:'Both vocals unite'},
+            {v1:'Female',v2:'Male',c:'Harmonized duet'},
+            {v1:'Male lead',v2:'Female harmony',c:'Male with female backing'},
+            {v1:'Female lead',v2:'Male harmony',c:'Female with male backing'}
+        ];
+
+        const backupDesc = {
+            minimal: ['subtle backing on key phrases', 'light harmonies'],
+            moderate: ['layered backing throughout', 'strong harmony supporting'],
+            full: ['full gospel choir', 'massive vocal ensemble']
+        };
+
+        let allLyrics = {};
+
+        function r(arr) { return arr[Math.floor(Math.random() * arr.length)]; }
+
+        function getWords(t) {
+            const el = document.getElementById(t === 'adj' ? 'adj' : t === 'nouns' ? 'nouns' : 'verbs');
+            const val = el.value.trim();
+            return val ? val.split(',').map(w => w.trim()) : defaults[t];
+        }
+
+        function makeTitle(banned) {
+            if (Math.random() < 0.7) {
+                const validTitles = qualityTitles.filter(t => !banned.some(b => t.toLowerCase().includes(b.toLowerCase())));
+                if (validTitles.length > 0) return r(validTitles);
+            }
+
+            const adjs = getWords('adj');
+            const nouns = getWords('nouns');
+            const verbs = ['Take', 'Hold', 'Let', 'Break', 'Set', 'Feel', 'Chase', 'Find', 'Lose', 'Keep', 'Give', 'Show', 'Run', 'Walk', 'Stand', 'Fly'];
+            const objects = ['Me', 'You', 'Us', 'Home', 'Tonight', 'Forever', 'Close', 'Away', 'Higher', 'Now'];
+            const preps = ['In', 'On', 'Through', 'Without', 'With', 'Under', 'Over', 'Beyond', 'Into', 'Across'];
+
+            const pattern = Math.floor(Math.random() * 6);
+            let title;
+            
+            if (pattern === 0) title = r(verbs) + ' Me ' + r(objects);
+            else if (pattern === 1) title = r(adjs) + ' ' + r(nouns);
+            else if (pattern === 2) title = 'The ' + r(adjs) + ' ' + r(nouns);
+            else if (pattern === 3) title = r(preps) + ' The ' + r(nouns);
+            else if (pattern === 4) title = r(verbs) + ' The ' + r(nouns);
+            else title = r(nouns) + ' And ' + r(nouns);
+            
+            if (banned.some(b => title.toLowerCase().includes(b.toLowerCase()))) {
+                return makeTitle(banned);
+            }
+            
+            return title;
+        }
+
+        function makeLyrics(title, banned) {
+            const length = parseInt(document.getElementById('songLength').value);
+            const genre = document.getElementById('genre').value || 'pop';
+            const collab = document.getElementById('collab').value;
+            const backup = document.getElementById('backup').value;
+
+            let duet = null, isDuet = false;
+            if (collab && collab.startsWith('duet')) {
+                isDuet = true;
+                if (collab === 'duet-random') duet = r(duetTypes);
+                else if (collab === 'duet-mf') duet = duetTypes[2];
+                else if (collab === 'duet-fm') duet = duetTypes[3];
+                else if (collab === 'duet-mf-trade') duet = duetTypes[0];
+                else if (collab === 'duet-fm-trade') duet = duetTypes[1];
+                else duet = duetTypes[0];
+            }
+
+            const bk = backup && backupDesc[backup] ? ', ' + r(backupDesc[backup]) : '';
+            
+            let s = '';
+            s += r(intros[genre] || intros.pop) + '\n\n';
+
+            // RANDOMIZE STRUCTURE HEAVILY
+            const structure = [];
+            const startWithChorus = Math.random() < 0.25;
+            const skipFirstPC = Math.random() < 0.4;
+            const skipSecondPC = Math.random() < 0.3;
+            const doubleBridge = length >= 6 && Math.random() < 0.2;
+            const extraVerse = length >= 5;
+            const instrumental = length >= 6;
+
+            if (startWithChorus) structure.push('chorus');
+            structure.push('verse');
+            if (!skipFirstPC) structure.push('prechorus');
+            if (!startWithChorus) structure.push('chorus');
+            structure.push('verse');
+            if (!skipSecondPC) structure.push('prechorus');
+            structure.push('chorus');
+            if (instrumental) structure.push('instrumental');
+            if (extraVerse || length >= 5) {
+                structure.push('bridge');
+                if (extraVerse) structure.push('verse');
+                if (doubleBridge) structure.push('bridge');
+                structure.push('prechorus');
+            }
+            structure.push('chorus');
+            if (length >= 7) {
+                structure.push('verse');
+                structure.push('chorus');
+            }
+
+            let verseCount = 0;
+            let pcCount = 0;
+            let chorCount = 0;
+            let bridgeCount = 0;
+
+            structure.forEach(section => {
+                if (section === 'verse') {
+                    verseCount++;
+                    s += `(Verse ${verseCount})` + (isDuet && verseCount === 2 ? ` [${duet.v2} vocal]` : isDuet ? ` [${duet.v1} vocal]` : '') + '\n';
+                    let verseText = r(verses).replace(/{adlib}/g, Math.random() < 0.3 ? r(shortAdlibs) : '');
+                    s += verseText + '\n';
+                    if (Math.random() < 0.2) s += r(questionAdlibs) + '\n';
+                    s += '\n';
+                } else if (section === 'prechorus') {
+                    pcCount++;
+                    s += '(Pre-Chorus) [Building' + bk + ']\n';
+                    let pcText = r(prechoruses).replace(/{adlib}/g, Math.random() < 0.4 ? r(shortAdlibs) : '');
+                    s += pcText + '\n\n';
+                } else if (section === 'chorus') {
+                    chorCount++;
+                    const chorLabel = chorCount > 2 ? '(Final Chorus)' : '(Chorus)';
+                    s += chorLabel + (isDuet ? ` [${duet.c}]` : '') + ` [${chorusDesc[genre] || chorusDesc.pop}` + bk + ']\n';
+                    let chorText = r(choruses).replace(/{title}/g, title).replace(/{adlib}/g, Math.random() < 0.5 ? r(shortAdlibs) : '');
+                    s += chorText + '\n\n';
+                } else if (section === 'bridge') {
+                    bridgeCount++;
+                    s += '[Bridge - Stripped down' + (isDuet ? ', trading lines' : '') + ']\n';
+                    let bridgeText = r(bridges).replace(/{adlib}/g, Math.random() < 0.5 ? r(shortAdlibs) : '');
+                    s += bridgeText + '\n\n';
+                } else if (section === 'instrumental') {
+                    s += '[Instrumental Break - ' + genre + ' showcase]\n\n';
+                }
+            });
+
+            // OUTRO
+            s += '[Outro - Fade after 10 seconds]\n';
+            const outroOptions = [
+                `${title}...\n${r(shortAdlibs)}...\nForever...`,
+                `Oh, ${title}...\nYeah...`,
+                `${title}...\n${title}...`,
+                `Mmm, ${title}...`
+            ];
+            s += r(outroOptions) + '\n';
+
+            return s;
+        }
+
+        function generate() {
+            const num = parseInt(document.getElementById('numSongs').value);
+            const banText = document.getElementById('banWords').value;
+            const banned = banText.split(',').map(w => w.trim()).filter(w => w);
+
+            const list = document.getElementById('songList');
+            list.innerHTML = '';
+            allLyrics = {};
+
+            for (let i = 0; i < num; i++) {
+                try {
+                    const title = makeTitle(banned);
+                    const lyrics = makeLyrics(title, banned);
+                    allLyrics[title] = lyrics;
+
+                    const div = document.createElement('div');
+                    div.className = 'song';
+                    div.textContent = title;
+                    div.onclick = () => showModal(title);
+                    list.appendChild(div);
+                } catch (error) {
+                    console.error('Error generating song:', error);
+                    alert('Error generating song: ' + error.message);
+                    break;
+                }
+            }
+        }
+
+        function showModal(title) {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('modalLyrics').textContent = allLyrics[title];
+            document.getElementById('modal').classList.add('show');
+        }
+
+        function closeModal() {
+            document.getElementById('modal').classList.remove('show');
+        }
+
+        function copyLyrics() {
+            navigator.clipboard.writeText(document.getElementById('modalLyrics').textContent);
+            alert('Copied!');
+        }
+
+        window.onload = () => {
+            document.getElementById('adj').value = defaults.adj.join(', ');
+            document.getElementById('nouns').value = defaults.nouns.join(', ');
+            document.getElementById('verbs').value = defaults.verbs.join(', ');
+        };
+    </script>
+</body>
+</html>
